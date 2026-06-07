@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Viewer | Live Camera Stream</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <main class="page-shell app-shell">
+      <header class="app-header">
+        <a class="brand" href="/">
+          <span class="brand-mark">LC</span>
+          <span>Live Camera Stream</span>
+        </a>
+        <nav class="top-nav" aria-label="Main navigation">
+          <a href="/broadcast">Start Broadcasting</a>
+        </nav>
+      </header>
+
+      <section class="workspace viewer-layout">
+        <div class="glass-card video-card viewer-card">
+          <div class="video-header">
+            <div>
+              <span class="eyebrow">Viewer</span>
+              <h1>Live Feed</h1>
+            </div>
+            <span id="statusBadge" class="status-badge" data-tone="neutral">Disconnected</span>
+          </div>
+
+          <div class="video-frame large">
+            <video id="remoteVideo" autoplay playsinline controls></video>
+            <div id="loadingOverlay" class="loading-overlay" hidden>
+              <div class="spinner"></div>
+              <span>Connecting...</span>
+            </div>
+          </div>
+
+          <p id="messageBox" class="message" data-tone="neutral" hidden></p>
+        </div>
+
+        <aside class="glass-card control-card viewer-controls">
+          <label for="streamCodeInput">Enter Stream Code</label>
+          <input
+            id="streamCodeInput"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            maxlength="6"
+            placeholder="A7K9X2"
+            aria-label="Stream code"
+          />
+
+          <div class="button-grid">
+            <button id="connectStream" class="button primary" type="button">Connect</button>
+            <button id="disconnectStream" class="button danger" type="button" hidden>
+              Disconnect
+            </button>
+            <button id="fullscreenVideo" class="button secondary" type="button">Fullscreen</button>
+          </div>
+
+          <div class="network-row">
+            <span>Network Status</span>
+            <strong id="networkBadge" data-tone="neutral">Checking</strong>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/socket.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/viewer.js"></script>
+  </body>
+</html>

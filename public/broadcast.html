@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Broadcast | Live Camera Stream</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <main class="page-shell app-shell">
+      <header class="app-header">
+        <a class="brand" href="/">
+          <span class="brand-mark">LC</span>
+          <span>Live Camera Stream</span>
+        </a>
+        <nav class="top-nav" aria-label="Main navigation">
+          <a href="/viewer">Watch Stream</a>
+        </nav>
+      </header>
+
+      <section class="workspace two-column">
+        <div class="glass-card video-card">
+          <div class="video-header">
+            <div>
+              <span class="eyebrow">Broadcaster</span>
+              <h1>Camera Preview</h1>
+            </div>
+            <span id="statusBadge" class="status-badge" data-tone="neutral">Offline</span>
+          </div>
+
+          <div class="video-frame">
+            <video id="localVideo" autoplay muted playsinline></video>
+            <div class="live-pill" aria-hidden="true">LIVE</div>
+          </div>
+
+          <p id="messageBox" class="message" data-tone="neutral" hidden></p>
+        </div>
+
+        <aside class="control-stack">
+          <div class="glass-card control-card">
+            <span class="eyebrow">Stream Code</span>
+            <div id="streamCode" class="code-display">------</div>
+            <button id="copyCode" class="button secondary full-width" type="button" disabled>
+              Copy Code
+            </button>
+          </div>
+
+          <div class="glass-card control-card metrics-grid">
+            <div>
+              <span class="metric-label">Viewers</span>
+              <strong id="viewerCount">0</strong>
+            </div>
+            <div>
+              <span class="metric-label">Status</span>
+              <strong id="viewerState">Waiting For Viewers</strong>
+            </div>
+            <div>
+              <span class="metric-label">Network</span>
+              <strong id="networkBadge" data-tone="neutral">Checking</strong>
+            </div>
+          </div>
+
+          <div class="glass-card control-card">
+            <label for="cameraSelect">Camera</label>
+            <select id="cameraSelect"></select>
+
+            <label for="microphoneSelect">Microphone</label>
+            <select id="microphoneSelect"></select>
+          </div>
+
+          <div class="button-grid">
+            <button id="startStream" class="button primary" type="button">Start Stream</button>
+            <button id="stopStream" class="button danger" type="button" hidden>Stop Stream</button>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/socket.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/broadcast.js"></script>
+  </body>
+</html>

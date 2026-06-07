@@ -1,0 +1,26 @@
+{
+  "name": "live-camera-stream",
+  "version": "1.0.0",
+  "description": "Production-ready live camera streaming app using Node.js, Express, Socket.IO, and WebRTC.",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
+  },
+  "keywords": [
+    "webrtc",
+    "socket.io",
+    "live-streaming",
+    "camera"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
