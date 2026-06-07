@@ -21,6 +21,12 @@
   const peerConnections = new Map();
 
   async function init() {
+    if (!socket) {
+      utils.setStatus(statusBadge, 'Offline', 'danger');
+      utils.showMessage(messageBox, 'Cannot connect to server. Please run the server ("npm run dev" or "npm start") and access this page via localhost.', 'danger');
+      startButton.disabled = true;
+      return;
+    }
     bindEvents();
     utils.updateNetworkBadge(networkBadge);
     await refreshDevices();

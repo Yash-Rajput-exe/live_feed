@@ -19,6 +19,13 @@
   let reconnectTimer = null;
 
   function init() {
+    if (!socket) {
+      utils.setStatus(statusBadge, 'Disconnected', 'danger');
+      utils.showMessage(messageBox, 'Cannot connect to server. Please run the server ("npm run dev" or "npm start") and access this page via localhost.', 'danger');
+      connectButton.disabled = true;
+      codeInput.disabled = true;
+      return;
+    }
     bindEvents();
     utils.updateNetworkBadge(networkBadge);
   }
