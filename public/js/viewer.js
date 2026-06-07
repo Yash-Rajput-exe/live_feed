@@ -162,6 +162,12 @@
         utils.setStatus(statusBadge, 'Connected', 'good');
         utils.showMessage(messageBox, 'Live feed connected.', 'good');
         showLoading(false);
+
+        // Explicitly play the video and handle autoplay prevention
+        remoteVideo.play().catch((error) => {
+          console.warn("Autoplay prevented:", error);
+          utils.showMessage(messageBox, 'Click the play button on the video player to start streaming.', 'warning');
+        });
       }
     };
 
