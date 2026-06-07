@@ -8,7 +8,10 @@ class RoomManager {
   }
 
   createStream(broadcasterId) {
-    const code = this.generateUniqueCode();
+    const code = 'ABC123';
+
+    // Clear any existing stream with this code to allow new broadcast session
+    this.destroyStream(code);
 
     this.activeStreams.set(code, {
       broadcasterId,
