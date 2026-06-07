@@ -2,24 +2,31 @@
   const socket = window.streamSocket;
   const utils = window.StreamUtils;
   const iceServers = [
+    // Xirsys STUN
+    { urls: 'stun:bn-turn2.xirsys.com' },
+    // Metered STUN
     { urls: 'stun:stun.relay.metered.ca:80' },
+    // Xirsys TURN (primary)
     {
-      urls: 'turn:global.relay.metered.ca:80',
-      username: '06913018a8acf7332fa6ca7d',
-      credential: 'Y9GmhjwVvmdM6yy3'
+      urls: [
+        'turn:bn-turn2.xirsys.com:80?transport=udp',
+        'turn:bn-turn2.xirsys.com:3478?transport=udp',
+        'turn:bn-turn2.xirsys.com:80?transport=tcp',
+        'turn:bn-turn2.xirsys.com:3478?transport=tcp',
+        'turns:bn-turn2.xirsys.com:443?transport=tcp',
+        'turns:bn-turn2.xirsys.com:5349?transport=tcp'
+      ],
+      username: 'RqZHk8jrk2GZsPQ57jSD0ySZ3IucDnBZkfvMPu2eyr2hA2Ytg12VlLlBdPOpW0UmAAAAAGol0wF1a3lyag==',
+      credential: '992a2b08-62ae-11f1-a2b8-0242ac140004'
     },
+    // Metered.ca TURN (fallback)
     {
-      urls: 'turn:global.relay.metered.ca:80?transport=tcp',
-      username: '06913018a8acf7332fa6ca7d',
-      credential: 'Y9GmhjwVvmdM6yy3'
-    },
-    {
-      urls: 'turn:global.relay.metered.ca:443',
-      username: '06913018a8acf7332fa6ca7d',
-      credential: 'Y9GmhjwVvmdM6yy3'
-    },
-    {
-      urls: 'turns:global.relay.metered.ca:443?transport=tcp',
+      urls: [
+        'turn:global.relay.metered.ca:80',
+        'turn:global.relay.metered.ca:80?transport=tcp',
+        'turn:global.relay.metered.ca:443',
+        'turns:global.relay.metered.ca:443?transport=tcp'
+      ],
       username: '06913018a8acf7332fa6ca7d',
       credential: 'Y9GmhjwVvmdM6yy3'
     }
@@ -39,6 +46,7 @@
   let currentCode = null;
   let broadcasterId = null;
   let reconnectTimer = null;
+  let hasVideoStream = false; // track if video ever successfully played
 
   function init() {
     if (!socket) {
@@ -162,14 +170,15 @@
 
       if (stream) {
         remoteVideo.srcObject = stream;
+        hasVideoStream = true;
         utils.setStatus(statusBadge, 'Connected', 'good');
         utils.showMessage(messageBox, 'Live feed connected.', 'good');
         showLoading(false);
 
-        // Explicitly play the video and handle autoplay prevention
+        // Explicitly play and handle autoplay prevention
         remoteVideo.play().catch((error) => {
-          console.warn("Autoplay prevented:", error);
-          utils.showMessage(messageBox, 'Click the play button on the video player to start streaming.', 'warning');
+          console.warn('Autoplay prevented:', error);
+          utils.showMessage(messageBox, 'Tap the play button on the video to start.', 'warning');
         });
       }
     };
@@ -196,19 +205,21 @@
         showLoading(false);
       }
 
-      // 'disconnected' is a transient state that often self-heals with TURN relay.
-      // Only show a soft warning - do NOT cover the playing video or trigger reconnect.
+      // 'disconnected' is transient with TURN - self-heals. Never cover the video.
       if (state === 'disconnected') {
         utils.setStatus(statusBadge, 'Unstable', 'warning');
-        utils.showMessage(messageBox, 'Connection momentarily unstable...', 'warning');
+        // Only show message if video not playing - don't interrupt a working stream
+        if (!hasVideoStream) {
+          utils.showMessage(messageBox, 'Connection momentarily unstable...', 'warning');
+        }
       }
 
-      // Only fully reconnect on a hard 'failed' state
+      // Hard failure - try to reconnect but preserve playing video
       if (state === 'failed') {
         utils.setStatus(statusBadge, 'Reconnecting...', 'warning');
-        utils.showMessage(messageBox, 'Connection lost. Trying to reconnect...', 'warning');
-        // Only show loading overlay if video is not already playing
-        if (!remoteVideo.srcObject) {
+        utils.showMessage(messageBox, 'Connection lost. Reconnecting...', 'warning');
+        // NEVER show black overlay if video was ever playing
+        if (!hasVideoStream) {
           showLoading(true);
         }
         scheduleReconnect();
@@ -235,8 +246,8 @@
     if (!currentCode || reconnectTimer) {
       return;
     }
-    // Only show loading overlay if video is not already streaming
-    if (!remoteVideo.srcObject) {
+    // Never show black overlay if video was successfully playing
+    if (!hasVideoStream) {
       showLoading(true);
     }
 
@@ -247,7 +258,12 @@
         return;
       }
 
-      cleanupPeerConnection();
+      // Close old peer connection but KEEP srcObject (video keeps playing)
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+      }
+
       socket.emit('stream:leave');
       socket.emit('stream:join', { code: currentCode }, ({ ok, message, broadcasterId: id }) => {
         if (!ok) {
@@ -258,12 +274,14 @@
           disconnectButton.hidden = true;
           utils.setStatus(statusBadge, 'Disconnected', 'danger');
           utils.showMessage(messageBox, message || 'Stream is no longer available.', 'danger');
+          remoteVideo.srcObject = null;
+          hasVideoStream = false;
           showLoading(false);
           return;
         }
 
         broadcasterId = id;
-        showLoading(true);
+        // Do NOT call showLoading(true) here if video was playing
       });
     }, 1200);
   }
@@ -273,6 +291,7 @@
     cleanupPeerConnection();
     currentCode = null;
     broadcasterId = null;
+    hasVideoStream = false;
     codeInput.disabled = false;
     connectButton.hidden = false;
     disconnectButton.hidden = true;

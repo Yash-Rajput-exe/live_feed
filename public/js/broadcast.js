@@ -2,24 +2,31 @@
   const socket = window.streamSocket;
   const utils = window.StreamUtils;
   const iceServers = [
+    // Xirsys STUN
+    { urls: 'stun:bn-turn2.xirsys.com' },
+    // Metered STUN
     { urls: 'stun:stun.relay.metered.ca:80' },
+    // Xirsys TURN (primary)
     {
-      urls: 'turn:global.relay.metered.ca:80',
-      username: '06913018a8acf7332fa6ca7d',
-      credential: 'Y9GmhjwVvmdM6yy3'
+      urls: [
+        'turn:bn-turn2.xirsys.com:80?transport=udp',
+        'turn:bn-turn2.xirsys.com:3478?transport=udp',
+        'turn:bn-turn2.xirsys.com:80?transport=tcp',
+        'turn:bn-turn2.xirsys.com:3478?transport=tcp',
+        'turns:bn-turn2.xirsys.com:443?transport=tcp',
+        'turns:bn-turn2.xirsys.com:5349?transport=tcp'
+      ],
+      username: 'RqZHk8jrk2GZsPQ57jSD0ySZ3IucDnBZkfvMPu2eyr2hA2Ytg12VlLlBdPOpW0UmAAAAAGol0wF1a3lyag==',
+      credential: '992a2b08-62ae-11f1-a2b8-0242ac140004'
     },
+    // Metered.ca TURN (fallback)
     {
-      urls: 'turn:global.relay.metered.ca:80?transport=tcp',
-      username: '06913018a8acf7332fa6ca7d',
-      credential: 'Y9GmhjwVvmdM6yy3'
-    },
-    {
-      urls: 'turn:global.relay.metered.ca:443',
-      username: '06913018a8acf7332fa6ca7d',
-      credential: 'Y9GmhjwVvmdM6yy3'
-    },
-    {
-      urls: 'turns:global.relay.metered.ca:443?transport=tcp',
+      urls: [
+        'turn:global.relay.metered.ca:80',
+        'turn:global.relay.metered.ca:80?transport=tcp',
+        'turn:global.relay.metered.ca:443',
+        'turns:global.relay.metered.ca:443?transport=tcp'
+      ],
       username: '06913018a8acf7332fa6ca7d',
       credential: 'Y9GmhjwVvmdM6yy3'
     }
