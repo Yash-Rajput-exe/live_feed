@@ -192,12 +192,25 @@
 
       if (state === 'connected') {
         utils.setStatus(statusBadge, 'Connected', 'good');
+        utils.showMessage(messageBox, 'Live feed connected.', 'good');
         showLoading(false);
       }
 
-      if (state === 'failed' || state === 'disconnected') {
+      // 'disconnected' is a transient state that often self-heals with TURN relay.
+      // Only show a soft warning - do NOT cover the playing video or trigger reconnect.
+      if (state === 'disconnected') {
+        utils.setStatus(statusBadge, 'Unstable', 'warning');
+        utils.showMessage(messageBox, 'Connection momentarily unstable...', 'warning');
+      }
+
+      // Only fully reconnect on a hard 'failed' state
+      if (state === 'failed') {
         utils.setStatus(statusBadge, 'Reconnecting...', 'warning');
-        utils.showMessage(messageBox, 'Connection is unstable. Trying to reconnect...', 'warning');
+        utils.showMessage(messageBox, 'Connection lost. Trying to reconnect...', 'warning');
+        // Only show loading overlay if video is not already playing
+        if (!remoteVideo.srcObject) {
+          showLoading(true);
+        }
         scheduleReconnect();
       }
     };
@@ -221,6 +234,10 @@
   function scheduleReconnect() {
     if (!currentCode || reconnectTimer) {
       return;
+    }
+    // Only show loading overlay if video is not already streaming
+    if (!remoteVideo.srcObject) {
+      showLoading(true);
     }
 
     reconnectTimer = window.setTimeout(() => {
