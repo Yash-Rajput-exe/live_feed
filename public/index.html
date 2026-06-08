@@ -3,122 +3,84 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="StreamSync — Stream your camera live to anyone, anywhere. One click to go live, share a 6-digit code, instant WebRTC connection." />
+    <meta name="description" content="StreamSync — Instant live camera streaming. Create a stream code and share your feed with any device, no downloads required." />
     <title>StreamSync — Live Camera Streaming</title>
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
-    <main class="page-shell landing-shell">
+    <div class="landing">
 
-      <!-- ── Navbar ── -->
-      <nav class="hero-nav">
-        <a class="brand" href="/" aria-label="StreamSync home">
-          <span class="brand-mark">📡</span>
-          <span>StreamSync</span>
+      <!-- ── Nav ── -->
+      <nav class="landing-nav">
+        <a class="logo" href="/">
+          <span class="logo-mark">S</span>
+          StreamSync
         </a>
-        <div style="display:flex;gap:10px">
-          <a class="button secondary" href="/broadcast" style="min-height:38px;padding:8px 18px;font-size:0.875rem">Go Live</a>
-          <a class="button primary" href="/viewer" style="min-height:38px;padding:8px 18px;font-size:0.875rem">Watch</a>
+        <div class="landing-nav-links">
+          <a class="btn btn-ghost btn-sm" href="/viewer">Watch Stream</a>
+          <a class="btn btn-primary btn-sm" href="/broadcast">Start Broadcasting</a>
         </div>
       </nav>
 
       <!-- ── Hero ── -->
-      <section class="hero-section">
-        <div class="hero-copy">
-          <div class="hero-eyebrow">✦ Powered by WebRTC · Peer-to-Peer</div>
-          <h1 class="hero-title">
-            Stream Live.<br>
-            <span class="grad">Anywhere.</span>
-          </h1>
-          <p class="hero-sub">
-            Broadcast your camera from any device and let anyone watch instantly using a private 6-digit code. No downloads, no accounts — just pure live video.
-          </p>
-          <div class="hero-actions">
-            <a class="button primary" href="/broadcast" id="goLiveBtn">
-              <span>🔴</span> Go Live
-            </a>
-            <a class="button secondary" href="/viewer" id="watchBtn">
-              <span>👁️</span> Watch Stream
-            </a>
-          </div>
+      <section class="hero">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          WebRTC · Peer-to-Peer · No Downloads
         </div>
 
-        <div class="hero-visual">
-          <div class="glass-card preview-card">
-            <div class="preview-card-header">
-              <div class="preview-dots">
-                <span></span><span></span><span></span>
-              </div>
-              <span class="preview-title">LIVE PREVIEW</span>
-              <div style="width:60px"></div>
-            </div>
-            <div class="preview-screen">
-              <div class="scan-line"></div>
-              <div class="camera-grid">
-                <div class="camera-cell"></div>
-                <div class="camera-cell"></div>
-                <div class="camera-cell"></div>
-                <div class="camera-cell"></div>
-              </div>
-              <div class="live-badge-hero">LIVE</div>
-              <div class="viewer-count-badge">👁 247 viewers</div>
-              <div class="signal-rings">
-                <span></span><span></span><span></span>
-                <div class="signal-core"></div>
-              </div>
-            </div>
-            <div class="preview-footer">
-              <div class="preview-stat">
-                <span class="preview-stat-label">Status</span>
-                <span class="preview-stat-val live">● LIVE</span>
-              </div>
-              <div class="preview-stat">
-                <span class="preview-stat-label">Code</span>
-                <span class="preview-stat-val cyan" id="demoCode">XK9F2A</span>
-              </div>
-              <div class="preview-stat">
-                <span class="preview-stat-label">Quality</span>
-                <span class="preview-stat-val good">HD</span>
-              </div>
-            </div>
-          </div>
+        <h1 class="hero-title">Live Camera<br>Streaming</h1>
+
+        <p class="hero-sub">
+          Create a private stream code and instantly share your
+          camera feed with any device, anywhere in the world.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="/broadcast" id="goLiveBtn">
+            Start Broadcasting
+          </a>
+          <a class="btn btn-secondary btn-lg" href="/viewer" id="watchBtn">
+            Watch Stream
+          </a>
         </div>
       </section>
 
       <!-- ── Features ── -->
-      <div class="features-row">
-        <div class="feature-card">
-          <div class="feature-icon purple">⚡</div>
-          <h3>Instant Connection</h3>
-          <p>WebRTC peer-to-peer technology means near-zero latency. No middleman, no buffering delays.</p>
+      <section class="features">
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-title">Real-time Streaming</div>
+            <div class="feature-desc">Sub-second latency via WebRTC peer-to-peer connections.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📱</div>
+            <div class="feature-title">No Downloads</div>
+            <div class="feature-desc">Works entirely in the browser. No apps or plugins needed.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🔒</div>
+            <div class="feature-title">Peer-to-Peer Encrypted</div>
+            <div class="feature-desc">Direct encrypted connection between broadcaster and viewer.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🌍</div>
+            <div class="feature-title">Works Everywhere</div>
+            <div class="feature-desc">TURN relay ensures connectivity across any network or firewall.</div>
+          </div>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon cyan">🔒</div>
-          <h3>Private by Default</h3>
-          <p>Only people with your 6-digit code can join. No public listings, no accounts required.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon green">🌍</div>
-          <h3>Works Everywhere</h3>
-          <p>TURN relay servers ensure your stream works across different networks, Wi-Fi, and mobile data.</p>
-        </div>
-      </div>
+      </section>
 
-    </main>
-    <script>
-      // Animate demo code so it's clearly NOT "ABC123"
-      const codes = ['XK9F2A', 'M7TR4Q', 'B3NZ8W', 'PY6CX1', 'LV2KD5'];
-      let ci = 0;
-      const demoCode = document.getElementById('demoCode');
-      setInterval(() => {
-        ci = (ci + 1) % codes.length;
-        demoCode.style.opacity = '0';
-        setTimeout(() => {
-          demoCode.textContent = codes[ci];
-          demoCode.style.opacity = '1';
-        }, 300);
-      }, 2500);
-      demoCode.style.transition = 'opacity 0.3s ease';
-    </script>
+      <!-- ── Footer ── -->
+      <footer class="landing-footer">
+        <span class="footer-copy">© 2025 StreamSync</span>
+        <div class="footer-links">
+          <a href="/broadcast">Broadcast</a>
+          <a href="/viewer">Viewer</a>
+        </div>
+      </footer>
+
+    </div>
   </body>
 </html>
