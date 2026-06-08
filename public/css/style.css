@@ -53,6 +53,9 @@
 /* ─── Reset ────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Critical: ensure [hidden] always wins over any display: property */
+[hidden] { display: none !important; }
+
 html {
   min-height: 100%;
   scroll-behavior: smooth;
@@ -963,7 +966,7 @@ select option { background: #0c1525; }
   position: absolute;
   inset: 0;
   z-index: 4;
-  display: grid;
+  display: none;          /* hidden by default */
   place-items: center;
   place-content: center;
   gap: 16px;
@@ -973,6 +976,11 @@ select option { background: #0c1525; }
   color: var(--text);
   font-weight: 700;
   font-size: 0.9rem;
+}
+
+/* Only show when explicitly made visible via JS */
+.loading-overlay.visible {
+  display: grid;
 }
 
 .spinner {

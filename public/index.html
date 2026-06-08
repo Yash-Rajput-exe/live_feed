@@ -74,7 +74,7 @@
               </div>
               <div class="preview-stat">
                 <span class="preview-stat-label">Code</span>
-                <span class="preview-stat-val cyan">XK9F2A</span>
+                <span class="preview-stat-val cyan" id="demoCode">XK9F2A</span>
               </div>
               <div class="preview-stat">
                 <span class="preview-stat-label">Quality</span>
@@ -105,5 +105,20 @@
       </div>
 
     </main>
+    <script>
+      // Animate demo code so it's clearly NOT "ABC123"
+      const codes = ['XK9F2A', 'M7TR4Q', 'B3NZ8W', 'PY6CX1', 'LV2KD5'];
+      let ci = 0;
+      const demoCode = document.getElementById('demoCode');
+      setInterval(() => {
+        ci = (ci + 1) % codes.length;
+        demoCode.style.opacity = '0';
+        setTimeout(() => {
+          demoCode.textContent = codes[ci];
+          demoCode.style.opacity = '1';
+        }, 300);
+      }, 2500);
+      demoCode.style.transition = 'opacity 0.3s ease';
+    </script>
   </body>
 </html>

@@ -312,7 +312,7 @@
   }
 
   function showLoading(isVisible) {
-    loadingOverlay.hidden = !isVisible;
+    loadingOverlay.classList.toggle('visible', isVisible);
   }
 
   async function openFullscreen() {
