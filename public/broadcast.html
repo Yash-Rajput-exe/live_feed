@@ -3,32 +3,107 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Broadcast | Live Camera Stream</title>
+    <meta name="description" content="StreamSync Broadcaster — Start your live camera stream and share your code with viewers." />
+    <title>Broadcast | StreamSync</title>
     <link rel="stylesheet" href="/css/style.css" />
+    <style>
+      /* ── Broadcaster-specific extras ── */
+      .copy-toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        padding: 10px 22px;
+        border-radius: 99px;
+        background: rgba(16,185,129,0.92);
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 700;
+        box-shadow: 0 8px 32px rgba(16,185,129,0.4);
+        backdrop-filter: blur(8px);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 350ms cubic-bezier(0.34,1.56,0.64,1);
+        z-index: 999;
+      }
+
+      .copy-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .viewer-pulse {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .viewer-pulse::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--good);
+        box-shadow: 0 0 10px var(--good);
+        animation: blink 1.5s ease-in-out infinite;
+      }
+
+      .share-hint {
+        font-size: 0.78rem;
+        color: var(--text-3);
+        text-align: center;
+        padding: 4px 0;
+      }
+
+      .device-label {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        margin-bottom: 6px;
+      }
+
+      .device-label label { margin-bottom: 0; }
+
+      .resolution-tag {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 99px;
+        background: var(--purple-dim);
+        color: var(--purple-light);
+        letter-spacing: 0.05em;
+      }
+    </style>
   </head>
   <body>
+    <div class="copy-toast" id="copyToast">✓ Code copied to clipboard!</div>
+
     <main class="page-shell app-shell">
+      <!-- ── Header ── -->
       <header class="app-header">
         <a class="brand" href="/">
-          <span class="brand-mark">LC</span>
-          <span>Live Camera Stream</span>
+          <span class="brand-mark">📡</span>
+          <span>StreamSync</span>
         </a>
         <nav class="top-nav" aria-label="Main navigation">
-          <a href="/viewer">Watch Stream</a>
+          <a href="/viewer">👁 Watch Stream</a>
         </nav>
       </header>
 
+      <!-- ── Workspace ── -->
       <section class="workspace two-column">
+
+        <!-- ── Left: Video Preview ── -->
         <div class="glass-card video-card">
           <div class="video-header">
             <div>
               <span class="eyebrow">Broadcaster</span>
               <h1>Camera Preview</h1>
             </div>
-            <span id="statusBadge" class="status-badge" data-tone="neutral">Offline</span>
+            <span id="statusBadge" class="status-badge" data-tone="neutral">● Offline</span>
           </div>
 
-          <div class="video-frame">
+          <div class="video-frame" id="videoFrame">
             <video id="localVideo" autoplay muted playsinline></video>
             <div class="live-pill" aria-hidden="true">LIVE</div>
           </div>
@@ -36,42 +111,68 @@
           <p id="messageBox" class="message" data-tone="neutral" hidden></p>
         </div>
 
+        <!-- ── Right: Controls ── -->
         <aside class="control-stack">
+
+          <!-- Stream Code -->
           <div class="glass-card control-card">
-            <span class="eyebrow">Stream Code</span>
-            <div id="streamCode" class="code-display">------</div>
-            <button id="copyCode" class="button secondary full-width" type="button" disabled>
-              Copy Code
+            <span class="eyebrow">Your Stream Code</span>
+            <div id="streamCode" class="code-display">——————</div>
+            <p class="share-hint">Share this code with your viewers</p>
+            <button id="copyCode" class="button primary full-width" type="button" disabled>
+              📋 Copy Code
             </button>
           </div>
 
-          <div class="glass-card control-card metrics-grid">
-            <div>
-              <span class="metric-label">Viewers</span>
-              <strong id="viewerCount">0</strong>
-            </div>
-            <div>
-              <span class="metric-label">Status</span>
-              <strong id="viewerState">Waiting For Viewers</strong>
-            </div>
-            <div>
-              <span class="metric-label">Network</span>
-              <strong id="networkBadge" data-tone="neutral">Checking</strong>
-            </div>
-          </div>
-
+          <!-- Stats -->
           <div class="glass-card control-card">
-            <label for="cameraSelect">Camera</label>
-            <select id="cameraSelect"></select>
-
-            <label for="microphoneSelect">Microphone</label>
-            <select id="microphoneSelect"></select>
+            <span class="eyebrow">Stream Stats</span>
+            <div class="metrics-grid">
+              <div class="metric-item">
+                <span class="metric-label">Viewers</span>
+                <span class="metric-val viewer-pulse" id="viewerCount">0</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Connection</span>
+                <span class="metric-val" id="viewerState">Waiting</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Network</span>
+                <span class="metric-val" id="networkBadge" data-tone="neutral">Checking…</span>
+              </div>
+            </div>
           </div>
 
+          <!-- Devices -->
+          <div class="glass-card control-card">
+            <span class="eyebrow">Input Devices</span>
+
+            <div>
+              <div class="device-label">
+                <label for="cameraSelect">Camera</label>
+                <span class="resolution-tag">HD</span>
+              </div>
+              <select id="cameraSelect"></select>
+            </div>
+
+            <div class="divider"></div>
+
+            <div>
+              <label for="microphoneSelect">Microphone</label>
+              <select id="microphoneSelect"></select>
+            </div>
+          </div>
+
+          <!-- Actions -->
           <div class="button-grid">
-            <button id="startStream" class="button primary" type="button">Start Stream</button>
-            <button id="stopStream" class="button danger" type="button" hidden>Stop Stream</button>
+            <button id="startStream" class="button primary" type="button">
+              🔴 Start Stream
+            </button>
+            <button id="stopStream" class="button danger" type="button" hidden>
+              ⏹ Stop Stream
+            </button>
           </div>
+
         </aside>
       </section>
     </main>
@@ -80,5 +181,13 @@
     <script src="/js/socket.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/broadcast.js"></script>
+    <script>
+      // Copy toast feedback
+      document.getElementById('copyCode').addEventListener('click', () => {
+        const toast = document.getElementById('copyToast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2200);
+      });
+    </script>
   </body>
 </html>
