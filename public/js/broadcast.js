@@ -46,6 +46,18 @@
     bindEvents();
     utils.updateNetworkBadge(networkBadge);
     await refreshDevices();
+    // Pre-generate stream code immediately so broadcaster can share it before going live
+    reserveStreamCode();
+  }
+
+  function reserveStreamCode() {
+    socket.emit('stream:create', ({ ok, code }) => {
+      if (!ok || !code) return;
+      streamCode = code;
+      utils.setText(streamCodeElement, code);
+      copyButton.disabled = false;
+      utils.showMessage(messageBox, `✓ Your code is ready — share it with viewers before you go live!`, 'good');
+    });
   }
 
   function bindEvents() {
@@ -127,26 +139,16 @@
   async function startStream() {
     try {
       startButton.disabled = true;
-      utils.showMessage(messageBox, 'Opening camera...', 'neutral');
+      utils.showMessage(messageBox, 'Opening camera…', 'neutral');
       await ensureLocalStream();
 
-      socket.emit('stream:create', ({ ok, code, message, viewerCount }) => {
-        if (!ok) {
-          startButton.disabled = false;
-          utils.showMessage(messageBox, message || 'Could not create stream.', 'danger');
-          return;
-        }
-
-        streamCode = code;
-        document.body.classList.add('is-streaming');
-        utils.setText(streamCodeElement, code);
-        utils.setStatus(statusBadge, 'LIVE', 'good');
-        utils.showMessage(messageBox, 'Stream is live. Share the code with viewers.', 'good');
-        updateViewerCount(viewerCount || 0);
-        startButton.hidden = true;
-        stopButton.hidden = false;
-        copyButton.disabled = false;
-      });
+      // Code was already reserved on page load — just go live
+      document.body.classList.add('is-streaming');
+      utils.setStatus(statusBadge, 'LIVE', 'good');
+      utils.showMessage(messageBox, '🔴 Stream is live! Viewers can now connect using your code.', 'good');
+      updateViewerCount(0);
+      startButton.hidden = true;
+      stopButton.hidden = false;
     } catch (error) {
       startButton.disabled = false;
       utils.setStatus(statusBadge, 'Camera blocked', 'danger');
@@ -157,7 +159,10 @@
   async function stopStream() {
     socket.emit('stream:stop');
     cleanup();
-    utils.showMessage(messageBox, 'Stream stopped. The code is now invalid.', 'neutral');
+    streamCode = null;
+    utils.setText(streamCodeElement, '——————');
+    copyButton.disabled = true;
+    utils.showMessage(messageBox, 'Stream stopped. Reload the page to get a new code.', 'neutral');
   }
 
   async function ensureLocalStream() {

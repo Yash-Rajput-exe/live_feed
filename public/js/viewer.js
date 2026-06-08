@@ -124,27 +124,37 @@
     currentCode = code;
     connectButton.disabled = true;
     codeInput.disabled = true;
-    utils.setStatus(statusBadge, 'Connecting...', 'warning');
-    utils.showMessage(messageBox, 'Connecting to the broadcaster...', 'neutral');
+
+    // Step 1: Show verifying animation
+    utils.setStatus(statusBadge, 'Verifying…', 'warning');
+    utils.showMessage(messageBox, '🔍 Verifying stream code…', 'warning');
     showLoading(true);
 
-    socket.emit('stream:join', { code }, ({ ok, message, broadcasterId: id }) => {
-      connectButton.disabled = false;
+    // Step 2: After short delay, actually join
+    setTimeout(() => {
+      socket.emit('stream:join', { code }, ({ ok, message, broadcasterId: id }) => {
+        connectButton.disabled = false;
 
-      if (!ok) {
-        currentCode = null;
-        codeInput.disabled = false;
-        utils.setStatus(statusBadge, 'Disconnected', 'danger');
-        utils.showMessage(messageBox, message || 'Stream not found.', 'danger');
-        showLoading(false);
-        return;
-      }
+        if (!ok) {
+          currentCode = null;
+          codeInput.disabled = false;
+          utils.setStatus(statusBadge, 'Invalid Code', 'danger');
+          utils.showMessage(messageBox, '❌ ' + (message || 'Stream not found. Check the code and try again.'), 'danger');
+          showLoading(false);
+          // Shake the input
+          codeInput.style.animation = 'none';
+          codeInput.offsetHeight; // reflow
+          codeInput.style.animation = 'shake 0.4s ease';
+          return;
+        }
 
-      broadcasterId = id;
-      connectButton.hidden = true;
-      disconnectButton.hidden = false;
-      utils.showMessage(messageBox, 'Waiting for live video...', 'neutral');
-    });
+        broadcasterId = id;
+        connectButton.hidden = true;
+        disconnectButton.hidden = false;
+        utils.setStatus(statusBadge, 'Connecting…', 'warning');
+        utils.showMessage(messageBox, '✓ Code verified! Connecting to live feed…', 'good');
+      });
+    }, 800);
   }
 
   async function answerOffer(offer) {

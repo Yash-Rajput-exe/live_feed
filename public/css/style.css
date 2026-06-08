@@ -86,6 +86,14 @@ body::before {
   100% { background-position: 5% 5%, 95% 5%, 52% 98%; }
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-6px); }
+  80%       { transform: translateX(6px); }
+}
+
 /* ─── Typography ───────────────────────────────────────────────── */
 h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; line-height: 1.1; }
 
